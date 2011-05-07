@@ -1,0 +1,172 @@
+#!/bin/sh
+
+mkdir="mkdir -p"
+sudo="sudo env PATH=${PATH}"
+md5_ext=".md5.txt"
+
+die_if_nonzero()
+{
+  "$@"
+  if [ $? != 0 ]; then
+    echo "failed: $@"
+    exit 1
+  fi
+}
+
+download()
+{
+  local src="$1"
+  local dst="$2"
+  curl --fail --silent --output "${dst}" "${src}"
+  if [ "$?" != "0" -a "$?" != "22" ]; then
+    die_if_nonzero false
+  fi
+}
+
+cat_txt()
+{
+  local path="$1"
+  if [ -f "${path}" ]; then
+    die_if_nonzero cat "${path}"
+  fi
+}
+
+cat_first()
+{
+  die_if_nonzero awk '{ print $1 }'
+}
+
+compute_md5()
+{
+  local path="$1"
+  if [ -f "${path}" ]; then
+    die_if_nonzero md5sum "${path}" | cat_first
+    return 0
+  fi
+  # This function outputs dummy text which is illegal as md5. So comparison in
+  # download_ext with any foobarbaz.md5.txt will be false always.
+  echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+}
+
+sub()
+{
+  local kernel="$1"
+  die_if_nonzero sed -e "s/KERNEL/${kernel}/g"
+}
+
+download_ext()
+{
+  local dir="$1"
+  local remote="$2"
+  local ext="$3"
+
+  local md5="${ext}${md5_ext}"
+  local md5_local="${dir}/${md5}"
+  local md5_expected=`cat_txt "${md5_local}" | cat_first`
+  local md5_actual=`compute_md5 "${dir}/${ext}"`
+  if [ "${md5_expected}" = "${md5_actual}" ]; then
+    return 0
+  fi
+
+  download "${remote}/${ext}" "${dir}/${ext}"
+
+  local dep="${ext}.dep"
+  download "${remote}/${dep}" "${dir}/${dep}"
+
+  download "${remote}/${md5}" "${md5_local}"
+}
+
+cleandir()
+{
+  local dir="$1"
+  if [ -d "${dir}" ]; then
+    die_if_nonzero ${sudo} rm -rf "${dir}"
+  fi
+}
+
+mkdir_empty()
+{
+  local dir=$1
+  cleandir "${dir}"
+  die_if_nonzero ${mkdir} "${dir}"
+}
+
+get_next_ext()
+{
+  local dir="$1"
+  local kernel="$2"
+  local pattern="${dir}/*${md5_ext}"
+  die_if_nonzero cat ${dir}/*.dep | sub "${kernel}" | die_if_nonzero sort -u | grep -vE "^[[:space:]]*\$" | while read ext
+  do
+    local md5="${dir}/${ext}${md5_ext}"
+    (ls ${pattern} 2> /dev/null | grep "${md5}" > /dev/null) || echo "${ext}"
+  done | die_if_nonzero head -n 1
+}
+
+cd `dirname $0`
+dir=`pwd`
+build_dir="${dir}/.build"
+${mkdir} "${build_dir}"
+version=`cat version.conf`
+tc_iso_name="tinycore_${version}.iso"
+tc_iso="${build_dir}/${tc_iso_name}"
+remote="http://distro.ibiblio.org/tinycorelinux/3.x"
+if [ ! -f "${tc_iso}" ]; then
+  download "${remote}/release/${tc_iso_name}" "${tc_iso}"
+fi
+
+mnt_dir="${build_dir}/mnt"
+${mkdir} "${mnt_dir}"
+die_if_nonzero ${sudo} mount -o loop "${tc_iso}" "${mnt_dir}"
+iso_dir="${build_dir}/iso"
+mkdir_empty "${iso_dir}"
+cp -a "${mnt_dir}/boot" "${iso_dir}"
+die_if_nonzero ${sudo} umount "${mnt_dir}"
+
+root_dir="${build_dir}/root"
+mkdir_empty "${root_dir}"
+tinycore_gz="${iso_dir}/boot/tinycore.gz"
+(
+  cd "${root_dir}"
+  die_if_nonzero zcat "${tinycore_gz}" | die_if_nonzero ${sudo} cpio -i -H newc -d
+)
+
+ext_dir="${build_dir}/extensions"
+${mkdir} "${ext_dir}"
+remote_dir="${remote}/tcz"
+kernel=`ls ${root_dir}/lib/modules`
+die_if_nonzero cat extensions.conf | sub "${kernel}" | while read ext
+do
+  download_ext "${ext_dir}" "${remote_dir}" "${ext}"
+done
+next_ext=`get_next_ext "${ext_dir}" "${kernel}"`
+while [ ! -z "${next_ext}" ]
+do
+  download_ext "${ext_dir}" "${remote_dir}" "${next_ext}"
+  next_ext=`get_next_ext "${ext_dir}" "${kernel}"`
+done
+
+for ext in ${ext_dir}/*.tcz
+do
+  die_if_nonzero ${sudo} unsquashfs -f -d "${root_dir}" "${ext}" > /dev/null
+done
+die_if_nonzero ${sudo} sh -c "cat >> \"${root_dir}/opt/bootlocal.sh\"" <<EOF
+for cmd in /usr/local/tce.installed/*
+do
+  "\${cmd}"
+done
+for cmd in /usr/local/etc/init.d/*
+do
+  "\${cmd}" start
+done
+EOF
+die_if_nonzero ${sudo} cp modules/* "${root_dir}/lib/modules/${kernel}"
+
+(
+  cd "${root_dir}"
+  chmod -R u+w "${iso_dir}"
+  die_if_nonzero find | die_if_nonzero ${sudo} cpio -o -H newc | die_if_nonzero  gzip -2 > "${tinycore_gz}"
+)
+${sudo} mkisofs -r -l -J -R -V sumix -no-emul-boot -boot-load-size 4 -boot-info-table -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat -o "${dir}/sumix.iso" "${iso_dir}" > /dev/null
+
+# vim: tabstop=2 shiftwidth=2 expandtab softtabstop=2
