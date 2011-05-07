@@ -167,6 +167,7 @@ die_if_nonzero ${sudo} cp modules/* "${root_dir}/lib/modules/${kernel}"
   chmod -R u+w "${iso_dir}"
   die_if_nonzero find | die_if_nonzero ${sudo} cpio -o -H newc | die_if_nonzero  gzip -2 > "${tinycore_gz}"
 )
-${sudo} mkisofs -r -l -J -R -V sumix -no-emul-boot -boot-load-size 4 -boot-info-table -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat -o "${dir}/sumix.iso" "${iso_dir}" > /dev/null
+version=`date +"%Y%m%d%H%M%S"`
+${sudo} mkisofs -r -l -J -R -V sumix -no-emul-boot -boot-load-size 4 -boot-info-table -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat -o "${dir}/sumix-${version}.iso" "${iso_dir}" > /dev/null
 
 # vim: tabstop=2 shiftwidth=2 expandtab softtabstop=2
