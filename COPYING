@@ -1,0 +1,15 @@
+
+Copyright Information about sumix
+=================================
+
+sumix consists of some components. License informations for each component are
+in each COPYING.* file.
+
+* COPYING.sumix: For sumix build tools etc.
+* COPYING.wallpaper: For the wallpaper.
+
+sumix bases on Tiny Core Linux (http://distro.ibiblio.org/tinycorelinux/). You
+can read the license for Tiny Core Linux at
+http://distro.ibiblio.org/tinycorelinux/faq.html#license.
+
+.. vim: tabstop=2 shiftwidth=2 expandtab softtabstop=2 filetype=rst
