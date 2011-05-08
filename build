@@ -107,8 +107,7 @@ cd `dirname $0`
 dir=`pwd`
 build_dir="${dir}/.build"
 ${mkdir} "${build_dir}"
-version=`cat version.conf`
-tc_iso_name="tinycore_${version}.iso"
+tc_iso_name="tinycore_`die_if_nonzero cat version.conf`.iso"
 tc_iso="${build_dir}/${tc_iso_name}"
 remote="http://distro.ibiblio.org/tinycorelinux/3.x"
 if [ ! -f "${tc_iso}" ]; then
@@ -173,7 +172,7 @@ EOF
   chmod -R u+w "${iso_dir}"
   die_if_nonzero find | die_if_nonzero ${sudo} cpio -o -H newc | die_if_nonzero  gzip -2 > "${tinycore_gz}"
 )
-version=`date +"%Y%m%d%H%M%S"`
-${sudo} mkisofs -r -l -J -R -V sumix -no-emul-boot -boot-load-size 4 -boot-info-table -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat -o "${dir}/sumix-${version}.iso" "${iso_dir}" > /dev/null
+version=${1+"-$1"}
+${sudo} mkisofs -r -l -J -R -V sumix -no-emul-boot -boot-load-size 4 -boot-info-table -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat -o "${dir}/sumix${version}.iso" "${iso_dir}" > /dev/null
 
 # vim: tabstop=2 shiftwidth=2 expandtab softtabstop=2
