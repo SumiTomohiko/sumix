@@ -162,11 +162,15 @@ done
 EOF
 die_if_nonzero ${sudo} cp modules/* "${root_dir}/lib/modules/${kernel}"
 
-die_if_nonzero ${sudo} cp wallpaper "${root_dir}/usr/share/pixmaps"
+pixmaps_dir="${root_dir}/usr/share/pixmaps"
+die_if_nonzero ${sudo} cp wallpaper "${pixmaps_dir}"
 die_if_nonzero ${sudo} sh -c "cat > '${root_dir}/etc/skel/.setbackground'" <<EOF
 #!/bin/sh
 hsetroot -solid "#587DAA" -full /usr/share/pixmaps/wallpaper
 EOF
+
+die_if_nonzero ${sudo} cp pixmaps/* "${pixmaps_dir}"
+die_if_nonzero ${sudo} sh -c "cat wbar >> '${root_dir}/usr/share/wbar/dot.wbar'"
 
 (
   cd "${root_dir}"
