@@ -114,18 +114,21 @@ Illegal instruction</code></pre>
         </section>
         <section>
           <h1>How to Build Customized sumix</h1>
-          <p>Building customized sumix needs the five steps.</p>
+          <p>Building customized sumix needs the following steps.</p>
           <ol>
             <li>Write the version of Tiny Core Linux in
             <code>version.conf</code>.</li>
             <li>Write the extensions to install by default in
             <code>extensions.conf</code>.</li>
+            <li>Copy your extentions in <code>extensions</code> directory.</li>
+            <li>Copy your images in <code>pixmaps</code> directory.</li>
+            <li>Write additional wbar settings in <code>wbar</code>.</li>
             <li>Copy the wallpaper as <code>wallpaper</code>.</li>
             <li>Copy <code>depmod</code> results in Tiny Core Linux to
             <code>modules</code> directory.</li>
             <li>Run <code>make</code>.</li>
           </ol>
-          <p>I explain more about the 4th step. Some packages install kernel
+          <p>I explain more about the 7th step. Some packages install kernel
           modules. In this case, Tiny Core Linux needs to update
           <code>/lib/modules/2.6.33.3-tinycore/modules.dep</code> etc by
           <code>depmod</code>. Installing extensions into Tiny Core Linux does
