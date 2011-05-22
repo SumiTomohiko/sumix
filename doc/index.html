@@ -72,14 +72,30 @@
       </section>
       <section>
         <h1>Known Problems</h1>
-        <p>Some PC show you dark screen. To solve this problem, give
-        <code>tinycore xsetup</code> command when boot.</p>
-        <img src="images/xsetup.png"/>
-        <p>You will see the list of resolution and color depth. Please tell
-        which your display is.</p>
-        <img src="images/resolution_setup.png"/>
-        <p>At the next step, enter the number of your mouse.</p>
-        <img src="images/mouse_setup.png"/>
+        <section>
+          <h1>Some PC show you a dark screen</h1>
+          <p>Some PC show you dark screen. To solve this problem, give
+          <code>tinycore xsetup</code> command when boot.</p>
+          <img src="images/xsetup.png"/>
+          <p>You will see the list of resolution and color depth. Please tell
+          which your display is.</p>
+          <img src="images/resolution_setup.png"/>
+          <p>At the next step, enter the number of your mouse.</p>
+          <img src="images/mouse_setup.png"/>
+        </section>
+        <section>
+          <h1>Illegal instruction</h1>
+          <p>Some old PC cannot execute Flourish. In this case, executing
+          Flourish in a terminal show you;</p>
+          <pre><code>$ flourish
+Illegal instruction</code></pre>
+          <p>The author saw this problem in Pentium II 350MHz machine.</p>
+        </section>
+        <section>
+          <h1>No Sound</h1>
+          <p>Flourish may sound nothing. sumix doesn't detect sound cards at
+          starting Flourish. Please restart Flourish.</p>
+        </section>
       </section>
       <section>
         <h1>How to Build sumix</h1>
