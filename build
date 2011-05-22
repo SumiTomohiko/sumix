@@ -132,6 +132,7 @@ tinycore_gz="${iso_dir}/boot/tinycore.gz"
 
 ext_dir="${build_dir}/extensions"
 ${mkdir} "${ext_dir}"
+die_if_nonzero cp extensions/* "${ext_dir}"
 remote_dir="${remote}/tcz"
 kernel=`ls ${root_dir}/lib/modules`
 die_if_nonzero cat extensions.conf | sub "${kernel}" | while read ext
