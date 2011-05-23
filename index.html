@@ -25,9 +25,9 @@
         <h1>Included Softwares</h1>
         <p><ul>
           <li><a href="http://SumiTomohiko.github.com/flourish">Flourish</a>
-          (action game)</li>
-          <li><a href="http://SumiTomohiko.github.com/Yog">Yog</a> (script
-          language)</li>
+          0.0.1 (action game)</li>
+          <li><a href="https://github.com/SumiTomohiko/Yog">Yog</a> 0.0.10
+          (script language)</li>
         </ul></p>
       </section>
       <section>
@@ -41,8 +41,8 @@
         </p>
       </section>
       <section>
-        <h1>Supported Architectures</h1>
-        <ul><li>x86</li></ul>
+        <h1>Requirements</h1>
+        <ul><li>Intel Pentinum M 1.4GHz or more</li></ul>
       </section>
       <section>
         <h1>Download CD-ROM Image and Source</h1>
@@ -72,23 +72,40 @@
       </section>
       <section>
         <h1>Known Problems</h1>
-        <p>Some PC show you dark screen. To solve this problem, give
-        <code>tinycore xsetup</code> command when boot.</p>
-        <img src="images/xsetup.png"/>
-        <p>You will see the list of resolution and color depth. Please tell
-        which your display is.</p>
-        <img src="images/resolution_setup.png"/>
-        <p>At the next step, enter the number of your mouse.</p>
-        <img src="images/mouse_setup.png"/>
+        <section>
+          <h1>Some PC show you a dark screen</h1>
+          <p>Some PC show you dark screen. To solve this problem, give
+          <code>tinycore xsetup</code> command when boot.</p>
+          <img src="images/xsetup.png"/>
+          <p>You will see the list of resolution and color depth. Please tell
+          which your display is.</p>
+          <img src="images/resolution_setup.png"/>
+          <p>At the next step, enter the number of your mouse.</p>
+          <img src="images/mouse_setup.png"/>
+        </section>
+        <section>
+          <h1>Illegal instruction</h1>
+          <p>Some old PC cannot execute Flourish. In this case, executing
+          Flourish in a terminal show you;</p>
+          <pre><code>$ flourish
+Illegal instruction</code></pre>
+          <p>The author saw this problem in Pentium II 350MHz machine.</p>
+        </section>
+        <section>
+          <h1>No Sound</h1>
+          <p>Flourish may sound nothing. sumix doesn't detect sound cards at
+          starting Flourish. Please restart Flourish.</p>
+        </section>
       </section>
       <section>
         <h1>How to Build sumix</h1>
         <section>
           <h1>Requirements</h1>
           <ol>
+            <li>Ubuntu Linux 8.04</li>
             <li><a href="http://squashfs.sourceforge.net/">Squashfs</a>.  Please
-            use latest version. Old versions cannot extract squashfs format of
-            Tiny Core Linux.</li>
+            use the latest version. Old versions (like one in Ubuntu Linux 8.04)
+            cannot extract squashfs format of Tiny Core Linux.</li>
           <ol>
         </section>
         <section>
@@ -98,18 +115,21 @@
         </section>
         <section>
           <h1>How to Build Customized sumix</h1>
-          <p>Building customized sumix needs the five steps.</p>
+          <p>Building customized sumix needs the following steps.</p>
           <ol>
             <li>Write the version of Tiny Core Linux in
             <code>version.conf</code>.</li>
             <li>Write the extensions to install by default in
             <code>extensions.conf</code>.</li>
+            <li>Copy your extentions in <code>extensions</code> directory.</li>
+            <li>Copy your images in <code>pixmaps</code> directory.</li>
+            <li>Write additional wbar settings in <code>wbar</code>.</li>
             <li>Copy the wallpaper as <code>wallpaper</code>.</li>
             <li>Copy <code>depmod</code> results in Tiny Core Linux to
             <code>modules</code> directory.</li>
             <li>Run <code>make</code>.</li>
           </ol>
-          <p>I explain more about the 4th step. Some packages install kernel
+          <p>I explain more about the 7th step. Some packages install kernel
           modules. In this case, Tiny Core Linux needs to update
           <code>/lib/modules/2.6.33.3-tinycore/modules.dep</code> etc by
           <code>depmod</code>. Installing extensions into Tiny Core Linux does
